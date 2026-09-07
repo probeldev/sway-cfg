@@ -10,20 +10,25 @@
     niri-screen-time.url = "github:probeldev/niri-screen-time";
     fastlauncher.url = "github:fastlauncher/fastlauncher";
     fastlauncher_next.url = "github:fastlauncher/fastlauncher_next";
-	sqlit.url = "github:Maxteabag/sqlit";
+    sqlit.url = "github:Maxteabag/sqlit";
+
+    # свежий rift напрямую из исходников, не дожидаясь nixpkgs-unstable
+    rift.url = "github:acsandmann/rift";
+    rift.flake = false;
   };
 
   outputs = inputs@{
-  	self,
- 		nix-darwin,
- 		nixpkgs,
- 		nixpkgs-25-11,
- 		nixpkgs-unstable,
- 		niri-screen-time,
- 		fastlauncher,
- 		fastlauncher_next,
-		sqlit,
- 	}:
+    self,
+    nix-darwin,
+    nixpkgs,
+    nixpkgs-25-11,
+    nixpkgs-unstable,
+    niri-screen-time,
+    fastlauncher,
+    fastlauncher_next,
+    sqlit,
+    rift,
+  }:
   let
     configuration = { pkgs, ... }:
     let
@@ -40,102 +45,116 @@
         system = pkgs.system;
         config.allowUnfree = true;
       };
+
+      # rift-wm из nixpkgs-unstable, но с src = последний master acsandmann/rift
+      rift-latest =
+        let
+          rev = rift.shortRev or "dirty";
+        in
+        pkgs-unstable.rift-wm.overrideAttrs (old: {
+          version = "git-${rev}";
+          src = rift;
+          cargoDeps = pkgs-unstable.rustPlatform.fetchCargoVendor {
+            pname = old.pname;
+            version = "git-${rev}";
+            src = rift;
+            # TODO: после первой сборки заменить на хеш из ошибки "hash mismatch"
+            hash = "sha256-wxymypJjczFqI9oivnVX/TOnR1KuupsaryQIQQVN7Gs=";
+          };
+        });
     in
     {
       # List packages installed in system profile. To search by name, run:
       # $ nix-env -qaP | grep wget
-      
-			nix.enable = false;
-			nixpkgs.config.allowUnfree = true;
-			nixpkgs.config.permittedInsecurePackages = [
-                "python3.12-ecdsa-0.19.1"
-              ];
 
-      environment.systemPackages = with pkgs; [ 
-			superfile
-			yazi
+      nix.enable = false;
+      nixpkgs.config.allowUnfree = true;
+      nixpkgs.config.permittedInsecurePackages = [
+        "python3.12-ecdsa-0.19.1"
+      ];
 
-			vim
-			neovim
-			telegram-desktop
-			dbgate
-			fzf
-			skim # rust alternative fzf
-			ripgrep
-			btop
-			lazygit
-			tree
+      environment.systemPackages = with pkgs; [
+        superfile
+        yazi
 
-			sqlit.packages.${pkgs.system}.default
+        vim
+        neovim
+        telegram-desktop
+        dbgate
+        fzf
+        skim # rust alternative fzf
+        ripgrep
+        btop
+        lazygit
+        tree
 
-			whisky
+        sqlit.packages.${pkgs.system}.default
 
-			go
-			gopls
-			gotools
-			golangci-lint
-     		vtsls
-			prettier
-			zig
+        whisky
 
-			orbstack
+        go
+        gopls
+        gotools
+        golangci-lint
+        vtsls
+        prettier
+        zig
 
-			ffmpeg
-			imagemagick
+        orbstack
 
-			cargo
-			rust-analyzer
-			rustfmt
+        ffmpeg
+        imagemagick
 
-			rio
+        cargo
+        rust-analyzer
+        rustfmt
 
-			nmap
+        rio
 
-			zed-editor
+        nmap
 
-			fastfetch
+        zed-editor
 
-			google-chrome
+        fastfetch
 
-			pkgs-25-11.renpy
+        google-chrome
 
-			pkgs-unstable.ollama
-			pkgs-unstable.opencode
-			pkgs-unstable.pi-coding-agent
-			pkgs-unstable.rtk
-			python313Packages.mlx-vlm
+        pkgs-25-11.renpy
 
-			zellij
-			
-			niri-screen-time.packages.${pkgs.system}.default
-			fastlauncher.packages.${pkgs.system}.default
-			fastlauncher_next.packages.${pkgs.system}.default
+        pkgs-unstable.ollama
+        pkgs-unstable.opencode
+        pkgs-unstable.pi-coding-agent
+        pkgs-unstable.rtk
+        python313Packages.mlx-vlm
 
-			starship
+        zellij
 
-			# unixporn
-			# aerospace
-			pkgs-unstable.rift-wm
-			skhd
-			jankyborders
+        niri-screen-time.packages.${pkgs.system}.default
+        fastlauncher.packages.${pkgs.system}.default
+        fastlauncher_next.packages.${pkgs.system}.default
 
-			sshuttle
+        starship
 
-			firefox
+        # unixporn
+        # aerospace
+        rift-latest
+        skhd
+        jankyborders
 
-			lima
+        sshuttle
 
-			## md2pdf
+        firefox
 
-			transmission_4-qt6
+        lima
 
-		];
+        ## md2pdf
 
+        transmission_4-qt6
+      ];
 
-
-			fonts.packages = with pkgs; [
-			   nerd-fonts.fira-code
-			];
+      fonts.packages = with pkgs; [
+        nerd-fonts.fira-code
+      ];
 
       # Necessary for using flakes on this system.
       nix.settings.experimental-features = "nix-command flakes";

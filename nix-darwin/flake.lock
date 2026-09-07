@@ -262,6 +262,22 @@
         "type": "github"
       }
     },
+    "rift": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1788729501,
+        "narHash": "sha256-8IKYPOGWcHRBqIvn3x1C103630+aV8MB09XJNVdV8q8=",
+        "owner": "acsandmann",
+        "repo": "rift",
+        "rev": "9d6913cb79dc812f1f7f9fd2f88c20e0bb419b09",
+        "type": "github"
+      },
+      "original": {
+        "owner": "acsandmann",
+        "repo": "rift",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "fastlauncher": "fastlauncher",
@@ -271,6 +287,7 @@
         "nixpkgs": "nixpkgs_4",
         "nixpkgs-25-11": "nixpkgs-25-11",
         "nixpkgs-unstable": "nixpkgs-unstable",
+        "rift": "rift",
         "sqlit": "sqlit"
       }
     },
