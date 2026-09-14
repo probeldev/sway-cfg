@@ -73,6 +73,11 @@
         "python3.12-ecdsa-0.19.1"
       ];
 
+      # darwin-rebuild без пароля (NOPASSWD), чтобы его могли запускать агенты и скрипты
+      security.sudo.extraConfig = ''
+        sergey ALL=(ALL) NOPASSWD: /run/current-system/sw/bin/darwin-rebuild
+      '';
+
       environment.systemPackages = with pkgs; [
         superfile
         yazi
